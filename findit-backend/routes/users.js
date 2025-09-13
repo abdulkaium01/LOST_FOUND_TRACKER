@@ -1,24 +1,14 @@
 const express = require('express');
-const {
-  getUsers,
-  getUser,
-  updateUser,
-  deleteUser
-} = require('../controllers/userController');
-
+const { getUsers, getUser, updateUser, deleteUser } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
-
 const router = express.Router();
 
-router.use(protect);
-router.use(authorize('admin'));
+router.use(protect, authorize('admin'));
 
-router
-  .route('/')
+router.route('/')
   .get(getUsers);
 
-router
-  .route('/:id')
+router.route('/:id')
   .get(getUser)
   .put(updateUser)
   .delete(deleteUser);

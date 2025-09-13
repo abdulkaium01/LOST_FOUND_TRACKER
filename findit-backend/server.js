@@ -1,55 +1,51 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const connectDB = require('./config/database');
 const path = require('path');
 
-// Load env vars
-dotenv.config();
+// Load env variables
+dotenv.config({ path: './config/config.env' });
 
 // Connect to database
-const connectDB = require('./config/database');
 connectDB();
 
 // Route files
-const auth = require('./routes/auth');
-const items = require('./routes/items');
-const users = require('./routes/users');
-const categories = require('./routes/categories');
+const auth = require('./routes/authRoutes');
+const categories = require('./routes/categoryRoutes');
+const items = require('./routes/itemRoutes');
+const users = require('./routes/userRoutes');
 
 const app = express();
 
-// Body parser middleware
+// Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Enable CORS
 app.use(cors());
 
-// Set static folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Set static folder for images
+app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
 
 // Mount routers
 app.use('/api/auth', auth);
+app.use('/api/categories', categories);
 app.use('/api/items', items);
 app.use('/api/users', users);
-app.use('/api/categories', categories);
 
-// Handle undefined routes
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
+const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 5000;
-
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const server = app.listen(
+  PORT,
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`);
-  // Close server & exit process
   server.close(() => process.exit(1));
 });

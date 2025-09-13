@@ -9,3 +9,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
+
+app.get('/api/items', (req, res) => {
+  res.json([{ id: 1, name: "Item A" }, { id: 2, name: "Item B" }]);
+});
